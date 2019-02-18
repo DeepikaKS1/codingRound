@@ -1,7 +1,10 @@
 import com.sun.javafx.PlatformUtil;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -15,13 +18,15 @@ public class SignInTest {
         setDriverPath();
 
         driver.get("https://www.cleartrip.com/");
-        waitFor(2000);
-
+        
+        WebDriverWait wait=new WebDriverWait(driver,30);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Your trips")));
         driver.findElement(By.linkText("Your trips")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("SignIn")));
         driver.findElement(By.id("SignIn")).click();
-
+        waitFor(2000);
+        driver.switchTo().frame("modal_window");
         driver.findElement(By.id("signInButton")).click();
-
         String errors1 = driver.findElement(By.id("errors1")).getText();
         Assert.assertTrue(errors1.contains("There were errors in your submission"));
         driver.quit();
@@ -38,12 +43,15 @@ public class SignInTest {
     private void setDriverPath() {
         if (PlatformUtil.isMac()) {
             System.setProperty("webdriver.chrome.driver", "chromedriver");
+            return;
         }
         if (PlatformUtil.isWindows()) {
             System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+            return;
         }
         if (PlatformUtil.isLinux()) {
             System.setProperty("webdriver.chrome.driver", "chromedriver_linux");
+            return;
         }
     }
 
